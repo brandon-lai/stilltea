@@ -1,5 +1,7 @@
 # Stilltea
 
+Source: [brandon-lai/stilltea](https://github.com/brandon-lai/stilltea).
+
 A single web page where a visitor makes one cup of tea, slowly, step by step.
 
 An illustrated dusk kitchen, four teas, tactile kettle/scoop/pot interactions, real-time steeping, procedural audio, optional breathing and rain, and a quiet ending. No account or backend.
@@ -65,41 +67,51 @@ Non-goals preserved verbatim:
 - Social sharing or multiplayer
 - A 3D scene
 
-## Verification status
+## Verification
 
-Passed locally:
+Run `npm test` for the pure ritual logic, then `npm run build` and
+`node --check dist/src/bundle.js` for the production export. `npm audit`
+reports zero vulnerabilities; this app has no package dependencies.
 
-- `npm test`: elapsed-time/background countdown, completion clamp, four distinct presets, temperature conversion, heating cap, invalid/denied storage and malformed settings.
-- `npm run build` and `node --check dist/src/bundle.js`.
-- `npm audit --offline`: zero vulnerabilities, zero dependencies. Online advisory access was unavailable.
-- DOM integration harness using an already-installed local jsdom: full eight-step flow, restart, keyboard heat hold, early release, overshoot cooling, timer completion, and settings persistence. This executes the real exported bundle with a controlled clock. It is not a visual/browser test.
+For real-browser checks, keep `npm run dev` running in another terminal and run:
 
-**Not verified:** real-browser rendering, responsive appearance, physical mouse/touch drag, audio playback/mixing, and production. The execution sandbox denied local HTTP listening (`EPERM`); the browser-control host was unavailable; the skill's headless Chrome probe could not open its debugging port. Do not treat this build as launch-verified until these checks are complete.
+```sh
+npm run test:browser
+# Or point the same checks at a running production export or live deployment:
+npm run test:browser -- https://your-deployment.example
+```
 
-Browser checklist after permissions are available:
+Passed locally on November 14, 2026: complete mouse, emulated touch, and
+keyboard rituals at 1200×900 and 360×760, settings persistence, cancelled and
+missed drops, drag position assertions, reduced-motion keyboard flow, and no
+uncaught browser errors. Screenshots were inspected for the arrival, selection,
+heating, steeping, final cup, and settings states.
 
-1. At 1200×900 and 360×760, render arrival, tea choice, heat, steep and final cup. Check text, clipping, horizontal overflow and control target alignment.
-2. Finish one complete ritual with mouse drag, one with touch, and one with only keyboard. Include a missed drop and cancelled pointer.
-3. Hold past green tea's target; confirm automatic cooling and no stuck input. Switch tabs during heating and steeping.
-4. Verify muted/unmuted sound, rain, optional numbers, °F and settings persistence after reload.
-5. Emulate reduced motion; confirm static steam/glow and all interactions still work.
-6. Repeat on the production URL; match its deployment commit SHA to `git rev-parse HEAD`.
+The browser check uses installed Google Chrome, Node's native WebSocket, and
+Chrome DevTools Protocol. Set `CHROME_PATH` if Chrome is installed elsewhere.
+It drives full rituals with mouse drag, emulated touch, and keyboard activation;
+checks missed and cancelled drops, object movement, settings persistence, and
+horizontal overflow; and saves state screenshots to the OS temporary directory.
+The keyboard run enables reduced motion. Only the steeping clock is advanced
+for the test; heating and input use real time. The test adds no runtime hooks
+to the application and requires no extra packages.
+
+The browser verification found and fixed an SVG transform bug: moving the scoop
+replaced its original position. Its resting transform now lives in a nested
+group, so pointer movement preserves its place in the scene.
+
+Human listening on actual speakers and physical phone testing remain manual
+checks. Headless touch emulation does not certify device-specific behavior.
 
 ## GitHub → Vercel publication
 
-Publishing is blocked in this execution environment: DNS resolution fails for api.github.com and registry.npmjs.org, and Vercel cannot confirm account access. GitHub auth reported an invalid token while offline; its real validity needs rechecking with network access. No GitHub repository or Vercel deployment has been created.
+GitHub authentication is available. Vercel's saved token is invalid and needs a
+fresh device sign-in with `vercel login` before publication can finish. No live
+production deployment has been verified yet.
 
-From a network-enabled terminal, after the browser checklist:
+After sign-in, connect the committed repository through Vercel's Git integration:
 
 ```sh
-cd /Users/brandon/Documents/Dev/stilltea
-gh auth status
-vercel whoami
-# Only if either reports unauthenticated:
-# gh auth login --web --git-protocol ssh --skip-ssh-key
-# vercel login
-
-gh repo create stilltea --public --source=. --remote=origin --push --description 'A quiet, tactile tea ritual'
 vercel link --yes --project stilltea
 vercel git connect --yes
 git commit --allow-empty -m 'Trigger first GitHub-connected production build'
@@ -107,4 +119,7 @@ git push origin main
 vercel ls stilltea
 ```
 
-Use Vercel's Git integration; never deploy an uncommitted working tree. The tracked `vercel.json` sets `npm run build` and `dist`. Inspect the resulting deployment and confirm its Git SHA before sharing a live URL. No environment variables are needed.
+The tracked `vercel.json` sets `npm run build` and `dist`. Never deploy an
+uncommitted working tree. Inspect the resulting deployment, match its Git SHA
+to `git rev-parse HEAD`, and run the browser checks against its URL before
+sharing it as verified. No environment variables are needed.
