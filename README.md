@@ -82,7 +82,8 @@ npm run test:browser -- https://your-deployment.example
 ```
 
 Passed locally on November 14, 2026: complete mouse, emulated touch, and
-keyboard rituals at 1200×900 and 360×760, settings persistence, cancelled and
+keyboard rituals on both the development app and built production export at
+1200×900 and 360×760, settings persistence, cancelled and
 missed drops, drag position assertions, reduced-motion keyboard flow, and no
 uncaught browser errors. Screenshots were inspected for the arrival, selection,
 heating, steeping, final cup, and settings states.
@@ -105,16 +106,10 @@ checks. Headless touch emulation does not certify device-specific behavior.
 
 ## GitHub → Vercel publication
 
-GitHub authentication is available. Vercel's saved token is invalid and needs a
-fresh device sign-in with `vercel login` before publication can finish. No live
-production deployment has been verified yet.
-
-After sign-in, connect the committed repository through Vercel's Git integration:
+The repository is connected to the `stilltea` project in Vercel through GitHub.
+Pushes to `main` trigger production builds:
 
 ```sh
-vercel link --yes --project stilltea
-vercel git connect --yes
-git commit --allow-empty -m 'Trigger first GitHub-connected production build'
 git push origin main
 vercel ls stilltea
 ```
