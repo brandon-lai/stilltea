@@ -1,0 +1,4 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';import {teas,remaining,temperature,heat,readSettings,defaults} from '../src/ritual.js';
+test('real elapsed time survives background suspension and clamps completion',()=>{assert.equal(remaining(1000,150,61000),90);assert.equal(remaining(1000,150,999999),0)});
+test('all four presets have real steep durations and distinct colors',()=>{assert.equal(teas.length,4);assert.equal(new Set(teas.map(t=>t.color)).size,4);assert.deepEqual(teas.map(t=>t.seconds),[150,180,180,300]);assert.equal(temperature(100,true),'212°F');assert.equal(heat(99,10),100)});
+test('storage denial, invalid JSON, and malformed preferences use safe defaults',()=>{assert.deepEqual(readSettings(null),defaults);assert.deepEqual(readSettings({getItem:()=>'{'}),defaults);assert.deepEqual(readSettings({getItem:()=>'{"sound":"false","numbers":true}'}),{...defaults,numbers:true})});
