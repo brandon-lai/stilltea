@@ -1,6 +1,6 @@
 # Stilltea
 
-Source: [brandon-lai/stilltea](https://github.com/brandon-lai/stilltea).
+Live: [stilltea.vercel.app](https://stilltea.vercel.app) · Source: [brandon-lai/stilltea](https://github.com/brandon-lai/stilltea).
 
 A single web page where a visitor makes one cup of tea, slowly, step by step.
 
